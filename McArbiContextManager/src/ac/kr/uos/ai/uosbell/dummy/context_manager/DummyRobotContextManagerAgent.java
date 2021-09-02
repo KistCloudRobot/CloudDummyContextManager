@@ -11,6 +11,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	DataSource ds;
 
 	RobotData rd = new RobotData();
+	String robotID = "";
 
 	public DummyRobotContextManagerAgent(String uri, String serverURI) {
 		super(uri, Configuration.ROBOT_SERVER_URI + serverURI);
@@ -27,6 +28,17 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 					e.printStackTrace();
 				}
 				String notifiedGLName = notifiedGL.getName();
+				
+				if (uri.contains("Lift1")) {
+					robotID = "AMR_LIFT1";
+				} else if (uri.contains("Lift2")) {
+					robotID = "AMR_LIFT2";
+				} else if (uri.contains("Tow1")) {
+					robotID = "AMR_TOW1";
+				} else if (uri.contains("Tow2")) {
+					robotID = "AMR_TOW2";
+				}
+				
 				if(notifiedGLName.contentEquals("CurrentRobotPosition")) {
 					rd.setPosX(notifiedGL.getExpression(1).asValue().intValue());
 					rd.setPosY(notifiedGL.getExpression(2).asValue().intValue());
@@ -34,17 +46,16 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 					rd.setLoading(notifiedGL.getExpression(1).asValue().stringValue());
 				} else if (notifiedGLName.contentEquals("RobotStatus")) {
 					rd.setStatus(notifiedGL.getExpression(1).asValue().stringValue());
-					this.updateFact("(update (context (OnRobotTaskStatus \"AMR_LIFT1\" $status)) (context (OnRobotTaskStatus \"AMR_LIFT1\" \"" + rd.getStatus() +"\")))");
+					this.updateFact("(update (context (OnRobotTaskStatus \""+robotID+"\" $status)) (context (OnRobotTaskStatus \""+robotID+"\" \"" + rd.getStatus() +"\")))");
 					System.out.println("Status Updated " + rd.getStatus());
 				} else if (notifiedGLName.contentEquals("RobotSpeed")) {
 					rd.setSpeed(notifiedGL.getExpression(1).asValue().intValue());
-					this.updateFact("(update (context (RobotVelocity \"AMR_LIFT1\" $v)) (context (RobotVelocity \"AMR_LIFT1\" " + rd.getSpeed() +")))");
+					this.updateFact("(update (context (RobotVelocity \""+robotID+"\" $v)) (context (RobotVelocity \""+robotID+"\" " + rd.getSpeed() +")))");
 					System.out.println("Speed Updated" + rd.getSpeed());
 				} else if (notifiedGLName.contentEquals("RobotBattery")) {
 					rd.setBattery(notifiedGL.getExpression(1).asValue().intValue());
-					this.updateFact("(update (context (BatteryRemain \"AMR_LIFT1\" $v)) (context (BatteryRemain \"AMR_LIFT1\" " + rd.getBattery() +")))");
+					this.updateFact("(update (context (BatteryRemain \""+robotID+"\" $v)) (context (BatteryRemain \""+robotID+"\" " + rd.getBattery() +")))");
 					System.out.println("battery Updated" + rd.getBattery());
-					
 				}
 				
 			}
@@ -56,16 +67,16 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 		ds.subscribe("(rule (fact (RobotSpeed $robotID $speed)) --> (notify (RobotSpeed $robotID $speed)))");
 		ds.subscribe("(rule (fact (RobotBattery $robotID $battery)) --> (notify (RobotBattery $robotID $battery)))");
 		
-		ds.assertFact("(context (RobotVelocity \"AMR_LIFT1\" 0))");
+		ds.assertFact("(context (RobotVelocity \""+robotID+"\" 0))");
 		System.out.println("velocity sent");
 		sleep();
-		ds.assertFact("(context (BatteryRemain \"AMR_LIFT1\" 0))");
+		ds.assertFact("(context (BatteryRemain \""+robotID+"\" 0))");
 		System.out.println("battery sent");
 		sleep();
-		ds.assertFact("(context (OnRobotTaskStatus \"AMR_LIFT1\" \"dummy\"))");
+		ds.assertFact("(context (OnRobotTaskStatus \""+robotID+"\" \"dummy\"))");
 		System.out.println("robottaskstatus sent");
 		sleep();
-		ds.assertFact("(context (RobotAt \"AMR_LIFT1\" 0 0))");
+		ds.assertFact("(context (RobotAt \""+robotID+"\" 0 0))");
 		System.out.println("robotat sent");
 		
 		
@@ -157,8 +168,8 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			rd.setPosX(x);
 			rd.setPosY(y);
 			
-			ds.updateFact("(update (context (RobotAt \"AMR_LIFT1\" $v1 $v2)) (context (RobotAt \"AMR_LIFT1\" "+(int)rd.getPosX()+" "+(int)rd.getPosY()+")))");
-			System.out.println("(update (context (RobotAt \"AMR_LIFT1\" $v1 $v2)) (context (RobotAt \"AMR_LIFT1\" "+(int)rd.getPosX()+" "+(int)rd.getPosY()+")))");
+			ds.updateFact("(update (context (RobotAt \""+robotID+"\" $v1 $v2)) (context (RobotAt \""+robotID+"\" "+(int)rd.getPosX()+" "+(int)rd.getPosY()+")))");
+			System.out.println("(update (context (RobotAt \"+robotID+\" $v1 $v2)) (context (RobotAt \""+robotID+"\" "+(int)rd.getPosX()+" "+(int)rd.getPosY()+")))");
 
 			break;
 		}
@@ -189,6 +200,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	}
 	
 	public static void main(String[] args) {
+		//실행할때 uri를 Lift1대신 TOW나 Lift2 등으로 바꾸면 바뀜
 		DummyRobotContextManagerAgent rAgent = new DummyRobotContextManagerAgent("Lift1/ContextManager", ":61116");
 	}
 }

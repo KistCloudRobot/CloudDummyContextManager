@@ -82,15 +82,26 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 		ds.subscribe("(rule (fact (Collidable $collidableList)) --> (notify (Collidable $collidableList)))");
 		ds.subscribe("(rule (fact (context $context)) --> (notify (context $context)))");
 		
-		ds.assertFact("(context (RobotVelocity \"AMR_LIFT1\" 0))");
-		sleep();
-		ds.assertFact("(context (BatteryRemain \"AMR_LIFT1\" 0))");
-		sleep();
-		ds.assertFact("(context (OnRobotTaskStatus \"AMR_LIFT1\" \"dummy\"))");
+		String[] ids = new String[] {
+				"AMR_LIFT1", "AMR_LIFT2", "AMR_TOW1", "AMR_TOW2"
+		};
 		
-		sleep();
-		ds.assertFact("(context (RobotAt \"AMR_LIFT1\" 0 0))");
-		System.out.println("robotat sent");
+		for (int i = 0; i < ids.length; i++) {
+			String id = ids[i];
+			System.out.println("ID SET TO " + id);
+			ds.assertFact("(context (RobotVelocity \""+id+"\" 0))");
+			System.out.println("RoboVelocity Asserted");
+			sleep();
+			ds.assertFact("(context (BatteryRemain \""+id+"\" 0))");
+			System.out.println("BatteryRemain Asserted");
+			sleep();
+			ds.assertFact("(context (OnRobotTaskStatus \""+id+"\" \"dummy\"))");
+			System.out.println("OnRobotTaskStatus Asserted");
+			sleep();
+			ds.assertFact("(context (RobotAt \""+id+"\" 0 0))");
+			System.out.println("RoboVelocity Asserted");
+		}
+		
 
 	}
 	
@@ -196,6 +207,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 			if (contextName.contentEquals("IdleLiftRack")) {
 				return "(context (IdleLiftRack \"rack001\"))";
 			} else if (contextName.contentEquals("OnStation")) {
+				
 				if (contextGL.getExpression(0).isVariable()) {
 					String queryObject = contextGL.getExpression(1).asValue().stringValue();
 					if (stationVertexMap.containsKey(queryObject)) {
