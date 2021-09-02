@@ -15,6 +15,15 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 
 	public DummyRobotContextManagerAgent(String uri, String serverURI) {
 		super(uri, Configuration.ROBOT_SERVER_URI + serverURI);
+		if (uri.contains("Lift1")) {
+			robotID = "AMR_LIFT1";
+		} else if (uri.contains("Lift2")) {
+			robotID = "AMR_LIFT2";
+		} else if (uri.contains("Tow1")) {
+			robotID = "AMR_TOW1";
+		} else if (uri.contains("Tow2")) {
+			robotID = "AMR_TOW2";
+		}
 		ds = new DataSource() {
 			@Override
 			public void onNotify(String content) {
@@ -29,15 +38,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 				}
 				String notifiedGLName = notifiedGL.getName();
 				
-				if (uri.contains("Lift1")) {
-					robotID = "AMR_LIFT1";
-				} else if (uri.contains("Lift2")) {
-					robotID = "AMR_LIFT2";
-				} else if (uri.contains("Tow1")) {
-					robotID = "AMR_TOW1";
-				} else if (uri.contains("Tow2")) {
-					robotID = "AMR_TOW2";
-				}
+				
 				
 				if(notifiedGLName.contentEquals("CurrentRobotPosition")) {
 					rd.setPosX(notifiedGL.getExpression(1).asValue().intValue());
@@ -200,7 +201,6 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	}
 	
 	public static void main(String[] args) {
-		//실행할때 uri를 Lift1대신 TOW나 Lift2 등으로 바꾸면 바뀜
-		DummyRobotContextManagerAgent rAgent = new DummyRobotContextManagerAgent("Lift1/ContextManager", ":61116");
+		DummyRobotContextManagerAgent rAgent = new DummyRobotContextManagerAgent("Tow2/ContextManager", ":61113");
 	}
 }
