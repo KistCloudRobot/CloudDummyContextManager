@@ -265,6 +265,13 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 				return "(context (RackType \"RACK_LIFT1\" \"lift\"))";
 			} else if (contextName.contentEquals("StationAvailability")) {
 				return "(context (OnStation \"rack010\" \"station20\"))";
+			} 
+		} else if (name.contentEquals("StationVertex")) {
+			String stationName = queryGL.getExpression(0).asValue().stringValue();
+			try {
+				return "(StationVertex \"" + stationName + "\" " + stationVertexMap.get(stationName) + ")";
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		return "(Error)";
