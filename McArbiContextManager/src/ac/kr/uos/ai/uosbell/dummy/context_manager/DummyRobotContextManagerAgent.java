@@ -39,6 +39,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 				String notifiedGLName = notifiedGL.getName();
 				
 				
+				sleep();
 				
 				if(notifiedGLName.contentEquals("CurrentRobotPosition")) {
 					rd.setPosX(notifiedGL.getExpression(1).asValue().intValue());
@@ -170,7 +171,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			rd.setPosY(y);
 			
 			ds.updateFact("(update (context (RobotAt \""+robotID+"\" $v1 $v2)) (context (RobotAt \""+robotID+"\" "+(int)rd.getPosX()+" "+(int)rd.getPosY()+")))");
-			System.out.println("(update (context (RobotAt \"+robotID+\" $v1 $v2)) (context (RobotAt \""+robotID+"\" "+(int)rd.getPosX()+" "+(int)rd.getPosY()+")))");
+			System.out.println("(update (context (RobotAt \"" + robotID + "\" $v1 $v2)) (context (RobotAt \""+robotID+"\" "+(int)rd.getPosX()+" "+(int)rd.getPosY()+")))");
 
 			break;
 		}
@@ -201,6 +202,6 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	}
 	
 	public static void main(String[] args) {
-		DummyRobotContextManagerAgent rAgent = new DummyRobotContextManagerAgent("Tow2/ContextManager", ":61113");
+		DummyRobotContextManagerAgent rAgent = new DummyRobotContextManagerAgent("Lift2/ContextManager", ":61115");
 	}
 }

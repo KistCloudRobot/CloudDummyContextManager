@@ -54,22 +54,26 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 					int firstValue = contentGL.getExpression(0).asValue().intValue();
 					int secondValue = contentGL.getExpression(1).asValue().intValue();
 					personCallID = UUID.randomUUID();
+					System.out.println("We've got MosPersonCall!");
 					if (firstValue == 0 && secondValue == 0) {
-						if (isStation18Storing) {
+						if (!isStation18Storing) {
 							ds.assertFact(
-									"(context (PersonCall \"station18\" \"PrepareStoring\" \"" + personCallID + "\"))");
+									"(context (PersonCall \"" + personCallID + "\" \"station18\" \"PrepareStoring\"))");
 							isStation18Storing = true;
 						} else {
-							ds.assertFact("(context (PersonCall \"station18\" \"Storing\" \"" + personCallID + "\"))");
+							ds.assertFact(
+									"(context (PersonCall \"" + personCallID + "\" \"station18\" \"Storing\"))");
 							isStation18Storing = false;
 						}
 					} else if (firstValue == 0 && secondValue == 1) {
-						ds.assertFact("(context (PersonCall \"station19\" \"Storing\" \"" + personCallID + "\"))");
+						ds.assertFact(
+								"(context (PersonCall \"" + personCallID + "\" \"station19\" \"Storing\"))");
 					} else if (firstValue == 1 && secondValue == 2) {
 						ds.assertFact(
-								"(context (PersonCall \"station22\" \"PrepareUnstoring\" \"" + personCallID + "\"))");
+								"(context (PersonCall \"" + personCallID + "\" \"station22\" \"PrepareUnstoring\"))");
 					} else if (firstValue == 1 && secondValue == 3) {
-						ds.assertFact("(context (PersonCall \"station22\" \"Unstoring\" \"" + personCallID + "\"))");
+						ds.assertFact(
+								"(context (PersonCall \"" + personCallID + "\" \"station22\" \"Unstoring\"))");
 					}
 					break;
 				}
@@ -81,6 +85,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 
 		ds.subscribe("(rule (fact (Collidable $collidableList)) --> (notify (Collidable $collidableList)))");
 		ds.subscribe("(rule (fact (context $context)) --> (notify (context $context)))");
+		ds.subscribe("(rule (fact (MosPersonCall $a $b)) --> (notify (MosPersonCall $a $b)))");
 		
 		String[] ids = new String[] {
 				"AMR_LIFT1", "AMR_LIFT2", "AMR_TOW1", "AMR_TOW2"
@@ -189,6 +194,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 	}
 
 	private String responseString = "";
+	private String queryObject = "";
 	
 	@Override
 	public String onQuery(String sender, String query) {
@@ -204,12 +210,13 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 		if (name.contentEquals("context")) {
 			GeneralizedList contextGL = queryGL.getExpression(0).asGeneralizedList();
 			String contextName = contextGL.getName();
+			System.out.println("ContextGL = " + contextGL.toString());
 			if (contextName.contentEquals("IdleLiftRack")) {
-				return "(context (IdleLiftRack \"rack001\"))";
+				return "(context (IdleLiftRack \"RACK_LIFT0\"))";
 			} else if (contextName.contentEquals("OnStation")) {
 				
 				if (contextGL.getExpression(0).isVariable()) {
-					String queryObject = contextGL.getExpression(1).asValue().stringValue();
+					queryObject = contextGL.getExpression(1).asValue().stringValue();
 					if (stationVertexMap.containsKey(queryObject)) {
 						rack.forEach((k, v) -> {
 							if (v.getVertex1() == v.getVertex2()) {
@@ -220,19 +227,34 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 						});
 						return "(context (OnStation \""+responseString+"\" \"" + queryObject + "\"))";
 					}
+					
+					queryObject = contextGL.getExpression(1).asValue().stringValue();
+					if (queryObject.contentEquals("station1")) {
+						return "(context (OnStation \"RACK_LIFT1\" \"station1\"))";
+					} else if (queryObject.contentEquals("station18")) {
+						return "(context (OnStation \"RACK_LIFT1\" \"station18\"))";
+					} else if (queryObject.contentEquals("station23")) {
+						return "(context (OnStation \"RACK_LIFT1\" \"station1\"))";
+					}
+				} else if (contextGL.getExpression(1).isVariable()) {
+					String queryObject = contextGL.getExpression(0).asValue().stringValue();
+					if (rack.containsKey(queryObject)) {
+						RackPose rp = rack.get(queryObject);
+						if (rp.getVertex1() == rp.getVertex2()) {
+							if (stationVertexMap.containsValue(rp.getVertex1())) {
+								
+							}
+						}						
+					}
+					return "(context (OnStation \"RACK_LIFT0\" \"station1\"))";
 				}
 
-				String queryObject = contextGL.getExpression(1).asValue().stringValue();
-				if (queryObject.contentEquals("station1")) {
-					return "(context (OnStation \"rack001\" \"station1\"))";
-				} else if (queryObject.contentEquals("station18")) {
-					return "(context (OnStation \"rack001\" \"station18\"))";
-				} else if (queryObject.contentEquals("station23")) {
-					return "(context (OnStation \"rack010\" \"station23\"))";
-				}
+				
+				
+				
 
 			} else if (contextName.contentEquals("OnRack")) {
-				return "(context (OnRack \"cargo001\" \"rack001\"))";
+				return "(context (OnRack \"cargo001\" \"RACK_LIFT1\"))";
 			} else if (contextName.contentEquals("EmptyStation")) {
 				if (contextGL.getExpression(0).isValue()) {
 					return "(true)";
@@ -240,7 +262,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 					return "(context (EmptyStation \"station1\"))";
 				}
 			} else if (contextName.contentEquals("RackType")) {
-				return "(context (RackType \"rack001\" \"lift\"))";
+				return "(context (RackType \"RACK_LIFT1\" \"lift\"))";
 			} else if (contextName.contentEquals("StationAvailability")) {
 				return "(context (OnStation \"rack010\" \"station20\"))";
 			}
