@@ -18,6 +18,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 		if (uri.contains("Lift1")) {
 			robotID = "AMR_LIFT1";
 		} else if (uri.contains("Lift2")) {
+			System.out.println("CM ID Set to AMR_LIFT2");
 			robotID = "AMR_LIFT2";
 		} else if (uri.contains("Tow1")) {
 			robotID = "AMR_TOW1";
@@ -28,6 +29,12 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			@Override
 			public void onNotify(String content) {
 				System.out.println("ONNOTIFY on " + uri + "//" + content);
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				GLParser parser = new GLParser();
 				GeneralizedList notifiedGL = null;
 				try {
@@ -37,14 +44,17 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 					e.printStackTrace();
 				}
 				String notifiedGLName = notifiedGL.getName();
-				
-				
+
 				sleep();
 				
 				if(notifiedGLName.contentEquals("CurrentRobotPosition")) {
-					rd.setPosX(notifiedGL.getExpression(1).asValue().intValue());
-					rd.setPosY(notifiedGL.getExpression(2).asValue().intValue());
+					int x = notifiedGL.getExpression(1).asValue().intValue();
+					int y = notifiedGL.getExpression(2).asValue().intValue();
+					System.out.println("robot position set to " + x + " / " + y);
+					rd.setPosX(x);
+					rd.setPosY(y);
 				} else if (notifiedGLName.contentEquals("RobotLoading")) {
+					System.out.println("Robot is loading " + notifiedGL.getExpression(1).asValue().stringValue());
 					rd.setLoading(notifiedGL.getExpression(1).asValue().stringValue());
 				} else if (notifiedGLName.contentEquals("RobotStatus")) {
 					rd.setStatus(notifiedGL.getExpression(1).asValue().stringValue());
@@ -70,19 +80,19 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 		ds.subscribe("(rule (fact (RobotBattery $robotID $battery)) --> (notify (RobotBattery $robotID $battery)))");
 		
 		ds.assertFact("(context (RobotVelocity \""+robotID+"\" 0))");
-		System.out.println("velocity sent");
+		System.out.println("velocity defait value sent");
 		sleep();
 		ds.assertFact("(context (BatteryRemain \""+robotID+"\" 0))");
-		System.out.println("battery sent");
+		System.out.println("battery default value sent");
 		sleep();
 		ds.assertFact("(context (OnRobotTaskStatus \""+robotID+"\" \"dummy\"))");
-		System.out.println("robottaskstatus sent");
+		System.out.println("robottaskstatus default value sent");
 		sleep();
 		ds.assertFact("(context (RobotAt \""+robotID+"\" 0 0))");
-		System.out.println("robotat sent");
+		System.out.println("robotat default value sent");
 		
 		
-		if(uri.contains("LIFT1")) {
+		if(uri.contains("LIFT")) {
 			ds.subscribe("(rule (fact (context (OnAgentTaskStatus $agentID $goal $status))) --> (notify (context (OnAgentTaskStatus $agentID $goal $status))))");
 			ds.subscribe("(rule (fact (context (OnRobotTaskStatus $robotID $status))) --> (notify (context (OnRobotTaskStatus $robotID $status))))");			
 		} else if (uri.contains("TOW")) {
@@ -112,9 +122,11 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 		String name = queryGL.getName();
 		if (name.contentEquals("PreparationVertex")) {
 			String vertexName = queryGL.getExpression(0).asValue().stringValue();
+			System.out.println("Vertex name is " + preparationVertex(vertexName));
 			return "(PreparationVertex \"" + vertexName + "\" " + preparationVertex(vertexName) + ")";
 		} else if (name.contentEquals("StationVertex")) {
 			String vertexName = queryGL.getExpression(0).asValue().stringValue();
+			System.out.println("Station's Vertex is" + stationVertex(vertexName));
 			return "(StationVertex \"" + vertexName + "\" " + stationVertex(vertexName) + ")";
 		}
 		return null;
