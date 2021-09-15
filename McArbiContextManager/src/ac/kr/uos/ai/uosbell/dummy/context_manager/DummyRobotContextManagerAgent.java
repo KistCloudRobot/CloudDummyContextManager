@@ -202,6 +202,9 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	}
 	
 	public static void main(String[] args) {
-		DummyRobotContextManagerAgent rAgent = new DummyRobotContextManagerAgent("Lift2/ContextManager", ":61115");
+		String brokerURL = System.getenv("JMS_BROKER");
+		String serverName = System.getenv("SERVER");
+		
+		new DummyRobotContextManagerAgent(serverName + "/ContextManager", brokerURL);
 	}
 }

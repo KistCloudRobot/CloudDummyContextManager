@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import kr.ac.uos.ai.arbi.Broker;
-import kr.ac.uos.ai.arbi.agent.ArbiAgentExecutor;
 import kr.ac.uos.ai.arbi.ltm.DataSource;
 import kr.ac.uos.ai.arbi.model.GeneralizedList;
 import kr.ac.uos.ai.arbi.model.parser.GLParser;
@@ -25,7 +24,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 	private HashMap<String, Integer> stationVertexMap;
 
 	public DummyLocalContextManagerAgent(String uri, String serverURI) {
-		super(uri, Configuration.LOCAL_SERVER_URI + serverURI);
+		super(uri, serverURI);
 		cargo = new HashMap<String, CargoPose>();
 		rack = new HashMap<String, RackPose>();
 		stationVertexMap = new HashMap<String, Integer>(Stream
@@ -278,6 +277,9 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 	}
 
 	public static void main(String[] args) {
-		DummyLocalContextManagerAgent cAgent = new DummyLocalContextManagerAgent("Local/ContextManager", ":61316");
+		String brokerURL = System.getenv("JMS_BROKER");
+		String serverName = System.getenv("SERVER");
+		
+		new DummyLocalContextManagerAgent(serverName + "/ContextManager", brokerURL);
 	}
 }
