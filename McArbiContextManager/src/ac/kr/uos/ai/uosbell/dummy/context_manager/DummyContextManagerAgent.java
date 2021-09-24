@@ -6,9 +6,10 @@ import kr.ac.uos.ai.arbi.agent.ArbiAgentExecutor;
 
 public class DummyContextManagerAgent extends ArbiAgent {
 
-	public DummyContextManagerAgent(String agentURI, String serverURI) {
-		System.out.println("trying to connect " + serverURI + " as " + agentURI);
-		ArbiAgentExecutor.execute(serverURI, Configuration.AGENT_NAME_PREFIX + agentURI, this, Broker.ZEROMQ);
+	public DummyContextManagerAgent(String brokerName, String brokerURL) {
+		String agentURI = "agent://www.arbi.com/" + brokerName + "/ContextManager";
+		System.out.println("trying to connect " + brokerURL + " as " + agentURI);
+		ArbiAgentExecutor.execute(brokerURL, agentURI, this, Broker.ZEROMQ);
 	}
 	
 	@Override

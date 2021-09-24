@@ -1,5 +1,8 @@
 package ac.kr.uos.ai.uosbell.dummy.context_manager;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import kr.ac.uos.ai.arbi.Broker;
 import kr.ac.uos.ai.arbi.agent.ArbiAgentExecutor;
 import kr.ac.uos.ai.arbi.ltm.DataSource;
@@ -13,21 +16,22 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	RobotData rd = new RobotData();
 	String robotID = "";
 
-	public DummyRobotContextManagerAgent(String uri, String serverURI) {
-		super(uri, Configuration.ROBOT_SERVER_URI + serverURI);
-		if (uri.contains("Lift1")) {
+	public DummyRobotContextManagerAgent(String brokerName, String brokerURL) {
+		super(brokerName, brokerURL);
+		if (brokerName.contains("Lift1")) {
 			robotID = "AMR_LIFT1";
-		} else if (uri.contains("Lift2")) {
+		} else if (brokerName.contains("Lift2")) {
 			robotID = "AMR_LIFT2";
-		} else if (uri.contains("Tow1")) {
+		} else if (brokerName.contains("Tow1")) {
 			robotID = "AMR_TOW1";
-		} else if (uri.contains("Tow2")) {
+		} else if (brokerName.contains("Tow2")) {
 			robotID = "AMR_TOW2";
 		}
+		
 		ds = new DataSource() {
 			@Override
 			public void onNotify(String content) {
-				System.out.println("ONNOTIFY on " + uri + "//" + content);
+				System.out.println("ONNOTIFY on " + brokerName + "/ContextManager //" + content);
 				GLParser parser = new GLParser();
 				GeneralizedList notifiedGL = null;
 				try {
@@ -62,7 +66,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 				
 			}
 		};
-		ds.connect(Configuration.ROBOT_SERVER_URI + serverURI, "ds://www.arbi.com/" + uri, Broker.ZEROMQ);
+		ds.connect(brokerURL, "ds://www.arbi.com/" + brokerName + "/ContextManager", Broker.ZEROMQ);
 		ds.subscribe("(rule (fact (CurrentRobotPosition $robotID $x $y)) --> (notify (CurrentRobotPosition $robotID $x $y)))");
 		ds.subscribe("(rule (fact (RobotLoading $robotID $loadStatus)) --> (notify (RobotLoading $robotID $loadStatus)))");
 		ds.subscribe("(rule (fact (RobotStatus $robotID $status)) --> (notify (RobotStatus $robotID $status)))");
@@ -81,11 +85,10 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 		ds.assertFact("(context (RobotAt \""+robotID+"\" 0 0))");
 		System.out.println("robotat sent");
 		
-		
-		if(uri.contains("LIFT1")) {
+		if(brokerName.contains("Lift")) {
 			ds.subscribe("(rule (fact (context (OnAgentTaskStatus $agentID $goal $status))) --> (notify (context (OnAgentTaskStatus $agentID $goal $status))))");
 			ds.subscribe("(rule (fact (context (OnRobotTaskStatus $robotID $status))) --> (notify (context (OnRobotTaskStatus $robotID $status))))");			
-		} else if (uri.contains("TOW")) {
+		} else if (brokerName.contains("Tow")) {
 			ds.subscribe("(rule (fact (DoorStatus $status)) --> (notify (DoorStatus $status)))");
 		}
 	}
@@ -202,9 +205,16 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	}
 	
 	public static void main(String[] args) {
-		String brokerURL = System.getenv("JMS_BROKER");
-		String serverName = System.getenv("SERVER");
-		
-		new DummyRobotContextManagerAgent(serverName + "/ContextManager", brokerURL);
+		try {
+			String ip = InetAddress.getLocalHost().getHostAddress();
+			String brokerURL = "tcp://" + ip + ":61316";
+			String brokerName = System.getenv("AGENT");
+			String ContextManagerURI = "agent://www.arbi.com/" + brokerName + "/ContextManager";
+			
+			new DummyRobotContextManagerAgent(brokerName, brokerURL);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
