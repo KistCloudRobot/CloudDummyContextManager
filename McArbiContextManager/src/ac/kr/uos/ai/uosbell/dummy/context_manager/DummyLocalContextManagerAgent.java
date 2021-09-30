@@ -25,7 +25,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 	private HashMap<String, Integer> stationVertexMap;
 
 	public DummyLocalContextManagerAgent(String uri, String serverURI) {
-		super(uri, Configuration.LOCAL_SERVER_URI + serverURI);
+		super(uri, serverURI);
 		cargo = new HashMap<String, CargoPose>();
 		rack = new HashMap<String, RackPose>();
 		stationVertexMap = new HashMap<String, Integer>(Stream
@@ -40,7 +40,6 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 		ds = new DataSource() {
 			@Override
 			public void onNotify(String content) {
-				System.out.println("ONNOTIFY on " + uri + "//" + content);
 				GLParser parser = new GLParser();
 				GeneralizedList contentGL = null;
 				try {
@@ -81,7 +80,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 				
 			}
 		};
-		ds.connect(Configuration.LOCAL_SERVER_URI + serverURI, "ds://www.arbi.com/" + uri, Broker.ZEROMQ);
+		ds.connect(serverURI, "ds://www.arbi.com/" + uri, Broker.ZEROMQ);
 
 		ds.subscribe("(rule (fact (Collidable $collidableList)) --> (notify (Collidable $collidableList)))");
 		ds.subscribe("(rule (fact (context $context)) --> (notify (context $context)))");
@@ -278,6 +277,8 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 	}
 
 	public static void main(String[] args) {
-		DummyLocalContextManagerAgent cAgent = new DummyLocalContextManagerAgent("Local/ContextManager", ":61316");
+		String uri = System.getenv("AGENT") + "/ContextManager";
+		String brokerURL = "tcp://" + System.getenv("JMS_BROKER");
+		DummyLocalContextManagerAgent cAgent = new DummyLocalContextManagerAgent(uri, brokerURL);
 	}
 }

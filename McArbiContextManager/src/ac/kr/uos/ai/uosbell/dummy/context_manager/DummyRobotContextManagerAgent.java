@@ -14,7 +14,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	String robotID = "";
 
 	public DummyRobotContextManagerAgent(String uri, String serverURI) {
-		super(uri, Configuration.ROBOT_SERVER_URI + serverURI);
+		super(uri, serverURI);
 		if (uri.contains("Lift1")) {
 			robotID = "AMR_LIFT1";
 		} else if (uri.contains("Lift2")) {
@@ -62,7 +62,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 				
 			}
 		};
-		ds.connect(Configuration.ROBOT_SERVER_URI + serverURI, "ds://www.arbi.com/" + uri, Broker.ZEROMQ);
+		ds.connect(serverURI, "ds://www.arbi.com/" + uri, Broker.ZEROMQ);
 		ds.subscribe("(rule (fact (CurrentRobotPosition $robotID $x $y)) --> (notify (CurrentRobotPosition $robotID $x $y)))");
 		ds.subscribe("(rule (fact (RobotLoading $robotID $loadStatus)) --> (notify (RobotLoading $robotID $loadStatus)))");
 		ds.subscribe("(rule (fact (RobotStatus $robotID $status)) --> (notify (RobotStatus $robotID $status)))");
@@ -202,6 +202,8 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	}
 	
 	public static void main(String[] args) {
-		DummyRobotContextManagerAgent rAgent = new DummyRobotContextManagerAgent("Lift2/ContextManager", ":61115");
+		String uri = System.getenv("AGENT") + "/ContextManager";
+		String brokerURL = "tcp://" + System.getenv("JMS_BROKER");
+		DummyRobotContextManagerAgent rAgent = new DummyRobotContextManagerAgent(uri, brokerURL);
 	}
 }

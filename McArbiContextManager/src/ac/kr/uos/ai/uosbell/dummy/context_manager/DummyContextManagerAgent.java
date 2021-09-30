@@ -8,7 +8,7 @@ public class DummyContextManagerAgent extends ArbiAgent {
 
 	public DummyContextManagerAgent(String agentURI, String serverURI) {
 		System.out.println("trying to connect " + serverURI + " as " + agentURI);
-		ArbiAgentExecutor.execute(serverURI, Configuration.AGENT_NAME_PREFIX + agentURI, this, Broker.ZEROMQ);
+		ArbiAgentExecutor.execute(serverURI, "agent://www.arbi.com/" + agentURI, this, Broker.ZEROMQ);
 	}
 	
 	@Override
