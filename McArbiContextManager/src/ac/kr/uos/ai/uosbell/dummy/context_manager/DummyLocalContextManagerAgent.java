@@ -247,7 +247,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 							}
 						}						
 					}
-					return "(context (OnStation \"RACK_LIFT0\" \"station1\"))";
+					return "(context (OnStation \"RACK_LIFT5\" \"station1\"))";
 				}
 
 				
@@ -281,8 +281,8 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 	public static void main(String[] args) {
 		try {
 			String ip = InetAddress.getLocalHost().getHostAddress();
-			String brokerURL = "tcp://" + ip + ":61316";
-			String brokerName = System.getenv("AGENT");
+			String brokerURL = "tcp://172.16.165.204:61313";
+			String brokerName = "Local";
 			
 			new DummyLocalContextManagerAgent(brokerName, brokerURL);
 		} catch (UnknownHostException e) {

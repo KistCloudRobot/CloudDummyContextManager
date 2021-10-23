@@ -129,6 +129,34 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			return 1;
 		case "station18":
 			return 18;
+		case "station19":
+			return 19;
+		case "station2":
+			return 2;
+		case "station3":
+			return 3;
+		case "station4":
+			return 4;
+		case "station5":
+			return 5;
+		case "station6":
+			return 6;
+		case "station11":
+			return 11;
+		case "station12":
+			return 12;
+		case "station13":
+			return 13;
+		case "station14":
+			return 14;
+		case "station15":
+			return 15;
+		case "station20":
+			return 20;
+		case "station21":
+			return 21;
+		case "station23":
+			return 23;
 		case "station22":
 			return 22;
 		}
@@ -141,6 +169,34 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			return 206;
 		case "station18":
 			return 225;
+		case "station19":
+			return 226;
+		case "station2":
+			return 207;
+		case "station3":
+			return 208;
+		case "station4":
+			return 209;
+		case "station5":
+			return 210;
+		case "station6":
+			return 211;
+		case "station11":
+			return 218;
+		case "station12":
+			return 219;
+		case "station13":
+			return 220;
+		case "station14":
+			return 221;
+		case "station15":
+			return 222;
+		case "station20":
+			return 239;
+		case "station21":
+			return 240;
+		case "station23":
+			return 229;
 		case "station22":
 			return 228;
 		}
@@ -210,8 +266,12 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			String brokerURL = "tcp://" + ip + ":61316";
 			String brokerName = System.getenv("AGENT");
 			String ContextManagerURI = "agent://www.arbi.com/" + brokerName + "/ContextManager";
-			
-			new DummyRobotContextManagerAgent(brokerName, brokerURL);
+
+//			new DummyRobotContextManagerAgent(brokerName, brokerURL);
+			new DummyRobotContextManagerAgent("Lift1", "tcp://172.16.165.204:61116");
+			new DummyRobotContextManagerAgent("Lift2", "tcp://172.16.165.204:61115");
+			new DummyRobotContextManagerAgent("Tow1", "tcp://172.16.165.204:61114");
+			new DummyRobotContextManagerAgent("Tow2", "tcp://172.16.165.204:61113");
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
