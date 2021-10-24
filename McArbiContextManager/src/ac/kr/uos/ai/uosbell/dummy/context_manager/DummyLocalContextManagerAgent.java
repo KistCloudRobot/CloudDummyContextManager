@@ -41,7 +41,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 		ds = new DataSource() {
 			@Override
 			public void onNotify(String content) {
-				System.out.println("ONNOTIFY on " + brokerName + "/contextManager //" + content);
+//				System.out.println("ONNOTIFY on " + brokerName + "/contextManager //" + content);
 				GLParser parser = new GLParser();
 				GeneralizedList contentGL = null;
 				try {
@@ -122,7 +122,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 
 	@Override
 	public void onNotify(String sender, String notification) {
-		System.out.println("LOCAL" + notification);
+//		System.out.println("LOCAL" + notification);
 		GLParser parser = new GLParser();
 
 		GeneralizedList gl = null;
@@ -214,7 +214,11 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 			System.out.println("ContextGL = " + contextGL.toString());
 			if (contextName.contentEquals("IdleLiftRack")) {
 				return "(context (IdleLiftRack \"RACK_LIFT0\"))";
-			} else if (contextName.contentEquals("OnStation")) {
+			} 
+			else if (contextName.contentEquals("IdleMovingRack")) {
+				return "(context (IdleMovingRack ))";
+			}
+			else if (contextName.contentEquals("OnStation")) {
 				
 				if (contextGL.getExpression(0).isVariable()) {
 					queryObject = contextGL.getExpression(1).asValue().stringValue();
@@ -226,7 +230,9 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 								}
 							}
 						});
-						return "(context (OnStation \""+responseString+"\" \"" + queryObject + "\"))";
+						//TODO tmp code
+						return "(context (OnStation \"rack001\" \"station20\"))";
+//						return "(context (OnStation \"" + responseString + "\" \"" + queryObject + "\"))";
 					}
 					
 					queryObject = contextGL.getExpression(1).asValue().stringValue();
@@ -249,11 +255,6 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 					}
 					return "(context (OnStation \"RACK_LIFT5\" \"station1\"))";
 				}
-
-				
-				
-				
-
 			} else if (contextName.contentEquals("OnRack")) {
 				return "(context (OnRack \"cargo001\" \"RACK_LIFT1\"))";
 			} else if (contextName.contentEquals("EmptyStation")) {

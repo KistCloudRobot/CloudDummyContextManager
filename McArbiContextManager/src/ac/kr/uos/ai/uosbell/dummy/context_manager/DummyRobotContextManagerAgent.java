@@ -31,7 +31,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 		ds = new DataSource() {
 			@Override
 			public void onNotify(String content) {
-				System.out.println("ONNOTIFY on " + brokerName + "/ContextManager //" + content);
+//				System.out.println("ONNOTIFY on " + brokerName + "/ContextManager //" + content);
 				GLParser parser = new GLParser();
 				GeneralizedList notifiedGL = null;
 				try {
@@ -53,15 +53,15 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 				} else if (notifiedGLName.contentEquals("RobotStatus")) {
 					rd.setStatus(notifiedGL.getExpression(1).asValue().stringValue());
 					this.updateFact("(update (context (OnRobotTaskStatus \""+robotID+"\" $status)) (context (OnRobotTaskStatus \""+robotID+"\" \"" + rd.getStatus() +"\")))");
-					System.out.println("Status Updated " + rd.getStatus());
+//					System.out.println("Status Updated " + rd.getStatus());
 				} else if (notifiedGLName.contentEquals("RobotSpeed")) {
 					rd.setSpeed(notifiedGL.getExpression(1).asValue().intValue());
 					this.updateFact("(update (context (RobotVelocity \""+robotID+"\" $v)) (context (RobotVelocity \""+robotID+"\" " + rd.getSpeed() +")))");
-					System.out.println("Speed Updated" + rd.getSpeed());
+//					System.out.println("Speed Updated" + rd.getSpeed());
 				} else if (notifiedGLName.contentEquals("RobotBattery")) {
 					rd.setBattery(notifiedGL.getExpression(1).asValue().intValue());
 					this.updateFact("(update (context (BatteryRemain \""+robotID+"\" $v)) (context (BatteryRemain \""+robotID+"\" " + rd.getBattery() +")))");
-					System.out.println("battery Updated" + rd.getBattery());
+//					System.out.println("battery Updated" + rd.getBattery());
 				}
 				
 			}
@@ -74,16 +74,16 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 		ds.subscribe("(rule (fact (RobotBattery $robotID $battery)) --> (notify (RobotBattery $robotID $battery)))");
 		
 		ds.assertFact("(context (RobotVelocity \""+robotID+"\" 0))");
-		System.out.println("velocity sent");
+//		System.out.println("velocity sent");
 		sleep();
 		ds.assertFact("(context (BatteryRemain \""+robotID+"\" 0))");
-		System.out.println("battery sent");
+//		System.out.println("battery sent");
 		sleep();
 		ds.assertFact("(context (OnRobotTaskStatus \""+robotID+"\" \"dummy\"))");
-		System.out.println("robottaskstatus sent");
+//		System.out.println("robottaskstatus sent");
 		sleep();
 		ds.assertFact("(context (RobotAt \""+robotID+"\" 0 0))");
-		System.out.println("robotat sent");
+//		System.out.println("robotat sent");
 		
 		if(brokerName.contains("Lift")) {
 			ds.subscribe("(rule (fact (context (OnAgentTaskStatus $agentID $goal $status))) --> (notify (context (OnAgentTaskStatus $agentID $goal $status))))");
@@ -210,7 +210,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 
 	@Override
 	public void onNotify(String sender, String notification) {
-		System.out.println("ROBOT//" + notification);
+//		System.out.println("ROBOT//" + notification);
 		GLParser parser = new GLParser();
 		GeneralizedList notificationGL = null;
 		try {
@@ -220,8 +220,8 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			e.printStackTrace();
 		}
 		String name = notificationGL.getName();
-		System.out.println("onNotify Called");
-		System.out.println(name);
+//		System.out.println("onNotify Called");
+//		System.out.println(name);
 		switch (name) {
 		case "RobotAt": {
 			int x = notificationGL.getExpression(1).asValue().intValue();
@@ -230,7 +230,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			rd.setPosY(y);
 			
 			ds.updateFact("(update (context (RobotAt \""+robotID+"\" $v1 $v2)) (context (RobotAt \""+robotID+"\" "+(int)rd.getPosX()+" "+(int)rd.getPosY()+")))");
-			System.out.println("(update (context (RobotAt \"" + robotID + "\" $v1 $v2)) (context (RobotAt \""+robotID+"\" "+(int)rd.getPosX()+" "+(int)rd.getPosY()+")))");
+//			System.out.println("(update (context (RobotAt \"" + robotID + "\" $v1 $v2)) (context (RobotAt \""+robotID+"\" "+(int)rd.getPosX()+" "+(int)rd.getPosY()+")))");
 
 			break;
 		}
@@ -241,12 +241,12 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			String before = "(RackAt \"" + stationName + "\" $v1 $v2) ";
 			String after = "(RackAt \"" + stationName + "\" " + x + " " + y + ")";
 			ds.updateFact("(update (context " + before + ") (context " + after + "))");
-			System.out.println("(update (context " + before + ") (context " + after + "))");
+//			System.out.println("(update (context " + before + ") (context " + after + "))");
 			break;
 		}
 		case "OnStation": {
 			ds.updateFact("(update (context (RackSeperatedAt $rack $stationID) (context (RackSeperatedAt \"rack001\" \"station1\")))");
-			System.out.println("(update (context (RackSeperatedAt $rack $stationID) (context (RackSeperatedAt \"rack001\" \"station1\")))");
+//			System.out.println("(update (context (RackSeperatedAt $rack $stationID) (context (RackSeperatedAt \"rack001\" \"station1\")))");
 			break;
 		}
 		case "context": {
@@ -271,7 +271,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			new DummyRobotContextManagerAgent("Lift1", "tcp://172.16.165.204:61116");
 			new DummyRobotContextManagerAgent("Lift2", "tcp://172.16.165.204:61115");
 			new DummyRobotContextManagerAgent("Tow1", "tcp://172.16.165.204:61114");
-			new DummyRobotContextManagerAgent("Tow2", "tcp://172.16.165.204:61113");
+			new DummyRobotContextManagerAgent("Tow2", "tcp://172.16.165.204:61112");
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
