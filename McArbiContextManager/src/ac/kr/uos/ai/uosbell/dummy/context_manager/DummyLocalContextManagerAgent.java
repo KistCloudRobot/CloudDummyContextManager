@@ -212,6 +212,53 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 			GeneralizedList contextGL = queryGL.getExpression(0).asGeneralizedList();
 			String contextName = contextGL.getName();
 			System.out.println("ContextGL = " + contextGL.toString());
+			if (contextName.toLowerCase().contentEquals("navigationvertex")) {
+				int station = contextGL.getExpression(0).asValue().intValue(); 
+				switch (station) {
+					case 20 :
+						return "(context (NavigationVertex 20 239))";
+					case 21 :
+						return "(context (NavigationVertex 21 240))";
+					case 22 :
+						return "(context (NavigationVertex 22 228))";
+					case 23 :
+						return "(context (NavigationVertex 23 229))";
+					case 103 :
+						return "(context (NavigationVertex 103 203))";
+					case 104 :
+						return "(context (NavigationVertex 104 204))";
+					case 101 :
+						return "(context (NavigationVertex 101 201))";
+					case 102 :
+						return "(context (NavigationVertex 102 202))";
+					case 1 :
+						return "(context (NavigationVertex 1 206))";
+					case 2 :
+						return "(context (NavigationVertex 2 207))";
+					case 3 :
+						return "(context (NavigationVertex 3 208))";
+					case 4 :
+						return "(context (NavigationVertex 4 209))";
+					case 5 :
+						return "(context (NavigationVertex 5 210))";
+					case 6 :
+						return "(context (NavigationVertex 6 211))";
+					case 11 :
+						return "(context (NavigationVertex 11 218))";
+					case 12 :
+						return "(context (NavigationVertex 12 219))";
+					case 13 :
+						return "(context (NavigationVertex 13 220))";
+					case 14 :
+						return "(context (NavigationVertex 14 221))";
+					case 15 :
+						return "(context (NavigationVertex 15 222))";
+					case 18 :
+						return "(context (NavigationVertex 18 225))";
+					case 19 :
+						return "(context (NavigationVertex 19 226))";
+				}
+			}
 			if (contextName.contentEquals("IdleLiftRack")) {
 				return "(context (IdleLiftRack \"RACK_LIFT0\"))";
 			} 
