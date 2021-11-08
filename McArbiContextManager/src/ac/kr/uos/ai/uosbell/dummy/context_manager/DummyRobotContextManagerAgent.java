@@ -268,10 +268,10 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			String ContextManagerURI = "agent://www.arbi.com/" + brokerName + "/ContextManager";
 
 //			new DummyRobotContextManagerAgent(brokerName, brokerURL);
-			new DummyRobotContextManagerAgent("Lift1", "tcp://172.16.165.204:61116");
-			new DummyRobotContextManagerAgent("Lift2", "tcp://172.16.165.204:61115");
-			new DummyRobotContextManagerAgent("Tow1", "tcp://172.16.165.204:61114");
-			new DummyRobotContextManagerAgent("Tow2", "tcp://172.16.165.204:61113");
+			new DummyRobotContextManagerAgent("Lift1", "tcp://127.0.0.1:61116");
+			new DummyRobotContextManagerAgent("Lift2", "tcp://127.0.0.1:61115");
+			new DummyRobotContextManagerAgent("Tow1", "tcp://127.0.0.1:61114");
+			new DummyRobotContextManagerAgent("Tow2", "tcp://127.0.0.1:61113");
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
