@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import ac.kr.uos.ai.uosbell.dummy.context_manager.local.DummyLocalContextManagerSocketCommunicator;
 import kr.ac.uos.ai.arbi.Broker;
 import kr.ac.uos.ai.arbi.ltm.DataSource;
 import kr.ac.uos.ai.arbi.model.GeneralizedList;
@@ -17,6 +18,14 @@ import kr.ac.uos.ai.arbi.model.parser.ParseException;
 public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 
 	DataSource ds;
+
+	public DataSource getDataSource() {
+		return ds;
+	}
+
+	public void setDataSource(DataSource ds) {
+		this.ds = ds;
+	}
 
 	private boolean isStation18Storing = false;
 	private UUID personCallID = null;
@@ -332,7 +341,11 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 			String brokerURL = "tcp://172.16.165.204:61313";
 			String brokerName = "Local";
 			
-			new DummyLocalContextManagerAgent(brokerName, brokerURL);
+			DummyLocalContextManagerAgent agent = new DummyLocalContextManagerAgent(brokerName, brokerURL);
+			
+			Thread t = new Thread(new DummyLocalContextManagerSocketCommunicator(agent));
+			t.start();
+			
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
