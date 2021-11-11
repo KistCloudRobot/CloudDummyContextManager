@@ -1,4 +1,4 @@
-package ac.kr.uos.ai.uosbell.dummy.context_manager;
+package ac.kr.uos.ai.uosbell.dummy.context_manager.model;
 
 public class RobotData {
 	private float posX;

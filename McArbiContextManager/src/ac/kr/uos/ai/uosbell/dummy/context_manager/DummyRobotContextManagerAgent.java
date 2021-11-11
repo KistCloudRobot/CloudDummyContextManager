@@ -3,6 +3,7 @@ package ac.kr.uos.ai.uosbell.dummy.context_manager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import ac.kr.uos.ai.uosbell.dummy.context_manager.model.RobotData;
 import kr.ac.uos.ai.arbi.Broker;
 import kr.ac.uos.ai.arbi.agent.ArbiAgentExecutor;
 import kr.ac.uos.ai.arbi.ltm.DataSource;
@@ -266,11 +267,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			String brokerURL = "tcp://" + ip + ":61316";
 			String brokerName = System.getenv("AGENT");
 			String ContextManagerURI = "agent://www.arbi.com/" + brokerName + "/ContextManager";
-
-//			new DummyRobotContextManagerAgent(brokerName, brokerURL);
-			//time to run again?
-			//수정한 내용 없으면 돌리시면 될?듯? current ip localhost? 
-			//근데 버전이 왜 꼬였던거지 ㅎㄷ
+			
 			Thread l1 = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -282,6 +279,35 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			
 			l1.start();
 			
+			Thread l2 = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					DummyRobotContextManagerAgent a = new DummyRobotContextManagerAgent("Lift2", "tcp://"+ip+":61115");
+					a.execute("Lift2", "tcp://"+ip+":61115", a);
+				}
+			});
+			
+			
+			l2.start();
+			
+			Thread t1 = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					DummyRobotContextManagerAgent a = new DummyRobotContextManagerAgent("Tow1", "tcp://"+ip+":61114");
+					a.execute("Tow1", "tcp://"+ip+":61114", a);
+				}
+			});
+			
+			t1.start();
+			
+			Thread t2 = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					DummyRobotContextManagerAgent a = new DummyRobotContextManagerAgent("Tow2", "tcp://"+ip+":61412");
+					a.execute("Tow2", "tcp://"+ip+":61412", a);
+				}
+			});
+			t2.start();
 			
 			
 			

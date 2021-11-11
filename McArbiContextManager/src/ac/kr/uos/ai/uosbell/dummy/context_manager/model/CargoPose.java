@@ -1,4 +1,4 @@
-package ac.kr.uos.ai.uosbell.dummy.context_manager;
+package ac.kr.uos.ai.uosbell.dummy.context_manager.model;
 
 
 public class CargoPose {
@@ -6,15 +6,22 @@ public class CargoPose {
 	private int vertex2;
 	private String robotID;
 	private String rackID;
-	
-	
-	
-	public CargoPose(int vertex1, int vertex2, String robotID, String rackID) {
-		super();
+	private String station;
+
+	public String getStation() {
+		return station;
+	}
+
+	public void setStation(String station) {
+		this.station = station;
+	}
+
+	public CargoPose(int vertex1, int vertex2, String robotID, String rackID, String station) {
 		this.vertex1 = vertex1;
 		this.vertex2 = vertex2;
 		this.robotID = robotID;
 		this.rackID = rackID;
+		this.station = station;
 	}
 	
 	public int getVertex1() {

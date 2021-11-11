@@ -1,4 +1,4 @@
-package ac.kr.uos.ai.uosbell.dummy.context_manager;
+package ac.kr.uos.ai.uosbell.dummy.context_manager.model;
 
 
 public class RackPose {
@@ -6,18 +6,28 @@ public class RackPose {
 	private int vertex2;
 	private String robotID;
 	private String cargoID;
+	private String station;
 	
-	public RackPose(int vertex1, int vertex2, String robotID, String cargoID) {
+	public RackPose(int vertex1, int vertex2, String robotID, String cargoID, String station) {
 		super();
 		this.vertex1 = vertex1;
 		this.vertex2 = vertex2;
 		this.robotID = robotID;
 		this.cargoID = cargoID;
+		this.station = station;
 	}
 	
 	public int getVertex1() {
 		return vertex1;
 	}
+	public String getStation() {
+		return station;
+	}
+
+	public void setStation(String station) {
+		this.station = station;
+	}
+
 	public void setVertex1(int vertex1) {
 		this.vertex1 = vertex1;
 	}

@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ac.kr.uos.ai.uosbell.dummy.context_manager.local.DummyLocalContextManagerSocketCommunicator;
+import ac.kr.uos.ai.uosbell.dummy.context_manager.model.CargoPose;
+import ac.kr.uos.ai.uosbell.dummy.context_manager.model.RackPose;
 import kr.ac.uos.ai.arbi.Broker;
 import kr.ac.uos.ai.arbi.ltm.DataSource;
 import kr.ac.uos.ai.arbi.model.GeneralizedList;
@@ -33,6 +35,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 	private HashMap<String, CargoPose> cargo;
 	private HashMap<String, RackPose> rack;
 	private HashMap<String, Integer> stationVertexMap;
+	private HashMap<Integer, String> reverseStationVertexMap;
 
 	public DummyLocalContextManagerAgent(String brokerName, String brokerURL) {
 		cargo = new HashMap<String, CargoPose>();
@@ -45,7 +48,8 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 						{ "station18", 18 }, { "station19", 19 }, { "station20", 20 }, { "station21", 21 },
 						{ "station22", 22 }, { "station23", 23 } })
 				.collect(Collectors.toMap(data -> (String) data[0], data -> (Integer) data[1])));
-
+		reverseStationVertexMap = new HashMap(stationVertexMap.entrySet().stream().collect(Collectors.toMap(HashMap.Entry::getValue, HashMap.Entry::getKey)));
+		
 		ds = new DataSource() {
 			@Override
 			public void onNotify(String content) {
@@ -128,6 +132,8 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 		}
 	}
 
+	
+	
 	@Override
 	public void onNotify(String sender, String notification) {
 //		System.out.println("LOCAL" + notification);
@@ -152,28 +158,41 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 			if (name.contentEquals("CargoPose")) {
 				String cargoID = gl.getExpression(0).asValue().stringValue();
 				String rackID = onGL.getExpression(1).asValue().stringValue();
+				String stationName = ""; 
+				if (vertex1 == vertex2) {
+				stationName = reverseStationVertexMap.get(vertex1);
+				}
 				if (cargo.containsKey(cargoID)) {
 					CargoPose cp = cargo.get(cargoID);
 					cp.setVertex1(vertex1);
 					cp.setVertex2(vertex2);
 					cp.setRobotID(robotID);
 					cp.setRackID(rackID);
+					cp.setStation(stationName);
 				} else {
-					cargo.put(cargoID, new CargoPose(vertex1, vertex2, robotID, rackID));
+					cargo.put(cargoID, new CargoPose(vertex1, vertex2, robotID, rackID, stationName));
 				}
+
 			} else if (name.contentEquals("RackPose")) {
 				String rackID = gl.getExpression(0).asValue().stringValue();
 				String cargoID = onGL.getExpression(1).asValue().stringValue();
+				String stationName = ""; 
+				if (vertex1 == vertex2) {
+					stationName = reverseStationVertexMap.get(vertex1);
+					}
 				if (rack.containsKey(rackID)) {
 					RackPose rp = rack.get(rackID);
 					rp.setVertex1(vertex1);
 					rp.setVertex2(vertex2);
 					rp.setRobotID(robotID);
 					rp.setCargoID(rackID);
+					rp.setStation(stationName);
 				} else {
-					rack.put(rackID, new RackPose(vertex1, vertex2, robotID, cargoID));
+					rack.put(rackID, new RackPose(vertex1, vertex2, robotID, cargoID, stationName));
 				}
 			}
+			
+
 		}
 
 		super.onNotify(sender, notification);
@@ -204,6 +223,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 
 	private String responseString = "";
 	private String queryObject = "";
+	boolean emptyStationFlag = false;
 	
 	@Override
 	public String onQuery(String sender, String query) {
@@ -303,10 +323,11 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 					if (rack.containsKey(queryObject)) {
 						RackPose rp = rack.get(queryObject);
 						if (rp.getVertex1() == rp.getVertex2()) {
-							if (stationVertexMap.containsValue(rp.getVertex1())) {
-								
+							if (reverseStationVertexMap.containsKey(rp.getVertex1())) {
+								String station = reverseStationVertexMap.get(rp.getVertex1());
+								return "(context (OnStation \"" + queryObject + "\" \"" + station + "\"))";
 							}
-						}						
+						}
 					}
 					return "(context (OnStation \"RACK_LIFT5\" \"station1\"))";
 				}
@@ -316,7 +337,12 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 				if (contextGL.getExpression(0).isValue()) {
 					return "(true)";
 				} else {
-					return "(context (EmptyStation \"station13\"))";
+					emptyStationFlag = !emptyStationFlag;
+					if (emptyStationFlag) {
+						return "(context (EmptyStation \"station1\"))";
+					} else {
+						return "(context (EmptyStation \"station13\"))";
+					}
 				}
 			} else if (contextName.contentEquals("RackType")) {
 				return "(context (RackType \"RACK_LIFT1\" \"lift\"))";
