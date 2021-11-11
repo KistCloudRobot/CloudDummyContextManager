@@ -17,7 +17,6 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	String robotID = "";
 
 	public DummyRobotContextManagerAgent(String brokerName, String brokerURL) {
-		super(brokerName, brokerURL);
 		if (brokerName.contains("Lift1")) {
 			robotID = "AMR_LIFT1";
 		} else if (brokerName.contains("Lift2")) {
@@ -262,16 +261,30 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	
 	public static void main(String[] args) {
 		try {
-			String ip = InetAddress.getLocalHost().getHostAddress();
+			String ipr = InetAddress.getLocalHost().getHostAddress();
+			String ip = "127.0.0.1";
 			String brokerURL = "tcp://" + ip + ":61316";
 			String brokerName = System.getenv("AGENT");
 			String ContextManagerURI = "agent://www.arbi.com/" + brokerName + "/ContextManager";
 
 //			new DummyRobotContextManagerAgent(brokerName, brokerURL);
-			new DummyRobotContextManagerAgent("Lift1", "tcp://172.16.165.204:61116");
-			new DummyRobotContextManagerAgent("Lift2", "tcp://172.16.165.204:61115");
-			new DummyRobotContextManagerAgent("Tow1", "tcp://172.16.165.204:61114");
-			new DummyRobotContextManagerAgent("Tow2", "tcp://172.16.165.204:61112");
+			//time to run again?
+			//수정한 내용 없으면 돌리시면 될?듯? current ip localhost? 
+			//근데 버전이 왜 꼬였던거지 ㅎㄷ
+			Thread l1 = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					DummyRobotContextManagerAgent a = new DummyRobotContextManagerAgent("Lift1", "tcp://"+ip+":61116");
+					a.execute("Lift1", "tcp://"+ip+":61116", a);
+				}
+			});
+			
+			
+			l1.start();
+			
+			
+			
+			
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

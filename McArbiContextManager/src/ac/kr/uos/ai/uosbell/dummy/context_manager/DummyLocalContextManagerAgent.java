@@ -35,7 +35,6 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 	private HashMap<String, Integer> stationVertexMap;
 
 	public DummyLocalContextManagerAgent(String brokerName, String brokerURL) {
-		super(brokerName, brokerURL);
 		cargo = new HashMap<String, CargoPose>();
 		rack = new HashMap<String, RackPose>();
 		stationVertexMap = new HashMap<String, Integer>(Stream
@@ -317,7 +316,7 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 				if (contextGL.getExpression(0).isValue()) {
 					return "(true)";
 				} else {
-					return "(context (EmptyStation \"station1\"))";
+					return "(context (EmptyStation \"station13\"))";
 				}
 			} else if (contextName.contentEquals("RackType")) {
 				return "(context (RackType \"RACK_LIFT1\" \"lift\"))";
@@ -337,14 +336,17 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 
 	public static void main(String[] args) {
 		try {
-			String ip = InetAddress.getLocalHost().getHostAddress();
-			String brokerURL = "tcp://172.16.165.204:61313";
+			String ipr = InetAddress.getLocalHost().getHostAddress();
+			String ip = "127.0.0.1";
+			String brokerURL = "tcp://"+ip+":61313";
 			String brokerName = "Local";
 			
 			DummyLocalContextManagerAgent agent = new DummyLocalContextManagerAgent(brokerName, brokerURL);
-			
+			agent.execute(brokerName, brokerURL, agent);
+
 			Thread t = new Thread(new DummyLocalContextManagerSocketCommunicator(agent));
 			t.start();
+
 			
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
