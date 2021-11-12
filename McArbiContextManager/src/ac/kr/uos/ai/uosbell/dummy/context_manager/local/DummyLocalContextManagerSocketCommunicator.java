@@ -20,7 +20,7 @@ public class DummyLocalContextManagerSocketCommunicator implements Runnable {
 	public void run() {
 		Socket socket = null;
 		try {
-			socket = new Socket("youlsa.i-on.net", 5151);
+			socket = new Socket("ec2-3-38-102-222.ap-northeast-2.compute.amazonaws.com", 5151);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
