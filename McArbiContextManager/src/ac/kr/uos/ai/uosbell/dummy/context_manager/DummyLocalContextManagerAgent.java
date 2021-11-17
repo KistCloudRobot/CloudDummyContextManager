@@ -3,6 +3,7 @@ package ac.kr.uos.ai.uosbell.dummy.context_manager;
 import java.awt.Point;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -291,7 +292,30 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 				return "(context (IdleLiftRack \"RACK_LIFT0\"))";
 			} 
 			else if (contextName.contentEquals("IdleMovingRack")) {
-				return "(context (IdleMovingRack ))";
+				if (contextGL.getExpression(0).isValue()) {
+					String rackName = contextGL.getExpression(0).asValue().stringValue();
+					//like "rack001" stuff
+					RackPose r = rack.get(rackName);
+					if (r.getCargoID().contentEquals("")) {
+						return "(true)";
+					} else {
+						return "(false)";
+					}
+				} else if (contextGL.getExpression(0).isVariable()) {
+					ArrayList<String> emptyRackLists = new ArrayList<String>();
+					rack.forEach((key, value)->{
+						if(value.getCargoID().contentEquals("")) {
+							emptyRackLists.add(key);
+						}
+					});
+					if (emptyRackLists.size() == 0) {
+						return "(error \"noIdleRack\")";
+					}
+					String response = "(context (IdleMovingRack \"" + String.join("\" \"", emptyRackLists) + "\"))";
+					return response;
+				}
+				
+				return "(error \"rackNotFound\")";
 			}
 			else if (contextName.contentEquals("OnStation")) {
 				
@@ -335,7 +359,24 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 				return "(context (OnRack \"cargo001\" \"RACK_LIFT1\"))";
 			} else if (contextName.contentEquals("EmptyStation")) {
 				if (contextGL.getExpression(0).isValue()) {
-					return "(true)";
+					//undummy
+
+					//20, 21 is empty tow rack
+					//idle tow rack search / tow rack ids
+					//query rack
+					
+					//
+					String stationName = contextGL.getExpression(0).asValue().stringValue();
+					boolean[] isStationEmpty = {true};
+					rack.forEach((key, value)->{
+						if (value.getStation().contentEquals(stationName)) {
+							isStationEmpty[0] = false;
+						}
+					});
+					if (isStationEmpty[0]) 
+						return "(true)";
+					else
+						return "(false)";
 				} else {
 					emptyStationFlag = !emptyStationFlag;
 					if (emptyStationFlag) {
@@ -370,8 +411,8 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 			DummyLocalContextManagerAgent agent = new DummyLocalContextManagerAgent(brokerName, brokerURL);
 			agent.execute(brokerName, brokerURL, agent);
 
-			Thread t = new Thread(new DummyLocalContextManagerSocketCommunicator(agent));
-			t.start();
+//			Thread t = new Thread(new DummyLocalContextManagerSocketCommunicator(agent));
+//			t.start();
 
 			
 		} catch (UnknownHostException e) {
