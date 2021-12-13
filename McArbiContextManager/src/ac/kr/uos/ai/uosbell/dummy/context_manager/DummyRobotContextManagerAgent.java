@@ -2,11 +2,19 @@ package ac.kr.uos.ai.uosbell.dummy.context_manager;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.management.StringValueExp;
+
+import ac.kr.uos.ai.uosbell.dummy.context_manager.model.InOutRule;
 import ac.kr.uos.ai.uosbell.dummy.context_manager.model.RobotData;
 import kr.ac.uos.ai.arbi.Broker;
 import kr.ac.uos.ai.arbi.agent.ArbiAgentExecutor;
 import kr.ac.uos.ai.arbi.ltm.DataSource;
+import kr.ac.uos.ai.arbi.model.Expression;
+import kr.ac.uos.ai.arbi.model.GLFactory;
 import kr.ac.uos.ai.arbi.model.GeneralizedList;
 import kr.ac.uos.ai.arbi.model.parser.GLParser;
 import kr.ac.uos.ai.arbi.model.parser.ParseException;
@@ -16,7 +24,34 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 
 	RobotData rd = new RobotData();
 	String robotID = "";
+	Map<String, InOutRule> rules = Stream.of(new Object[][] {
+		{"1", new InOutRule(1, "ReqPreciseMove", 1, "ReqStraightBackMove", 206)},
+		{"2", new InOutRule(2, "ReqPreciseMove", 2, "ReqStraightBackMove", 207)},
+		{"3", new InOutRule(3, "ReqPreciseMove", 3, "ReqStraightBackMove", 208)},
+		{"4", new InOutRule(4, "ReqPreciseMove", 4, "ReqStraightBackMove", 209)},
+		{"5", new InOutRule(5, "ReqPreciseMove", 5, "ReqStraightBackMove", 210)},
+		{"6", new InOutRule(6, "ReqPreciseMove", 6, "ReqStraightBackMove", 211)},
+		{"11", new InOutRule(11, "ReqPreciseMove", 11, "ReqStraightBackMove", 218)},
+		{"12", new InOutRule(12, "ReqPreciseMove", 12, "ReqStraightBackMove", 219)},
+		{"13", new InOutRule(13, "ReqPreciseMove", 13, "ReqStraightBackMove", 220)},
+		{"14", new InOutRule(14, "ReqPreciseMove", 14, "ReqStraightBackMove", 221)},
+		{"15", new InOutRule(15, "ReqPreciseMove", 15, "ReqStraightBackMove", 222)},
+		{"18", new InOutRule(18, "ReqGuideMove", 18, "ReqStraightBackMove", 225)},
+		{"19", new InOutRule(19, "ReqGuideMove", 19, "ReqStraightBackMove", 226)},
+		{"20", new InOutRule(20, "ReqGuideMove", 20, "ReqGuideMove", 239)},
+		{"21", new InOutRule(21, "ReqGuideMove", 21, "ReqGuideMove", 240)},
+		{"22", new InOutRule(22, "ReqGuideMove", 22, "ReqStraightBackMove", 228)},
+		{"23", new InOutRule(23, "ReqGuideMove", 23, "ReqGuideMove", 229)},
+		{"101", new InOutRule(101, "ReqGuideMove", 101, "ReqGuideMove", 201)},
+		{"102", new InOutRule(102, "ReqGuideMove", 102, "ReqGuideMove", 202)},
+		{"103", new InOutRule(103, "ReqGuideMove", 103, "ReqGuideMove", 203)},
+		{"104", new InOutRule(104, "ReqGuideMove", 104, "ReqGuideMove", 204)},
+	}).collect(Collectors.toMap(data -> (String) data[0],  data -> (InOutRule) data[1]));
 
+	public DummyRobotContextManagerAgent() {
+		System.out.println("Debug Constructor Only! do not execute without purpose.");
+	}
+	
 	public DummyRobotContextManagerAgent(String brokerName, String brokerURL) {
 		if (brokerName.contains("Lift1")) {
 			robotID = "AMR_LIFT1";
@@ -119,8 +154,40 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 		} else if (name.contentEquals("StationVertex")) {
 			String vertexName = queryGL.getExpression(0).asValue().stringValue();
 			return "(StationVertex \"" + vertexName + "\" " + stationVertex(vertexName) + ")";
+		} else if (name.contentEquals("StationMoveType")) {
+			return getStationMoveType(queryGL);
+			
 		}
 		return null;
+	}
+
+	private String getStationMoveType(GeneralizedList queryGL) {
+		String station = queryGL.getExpression(0).asValue().stringValue();
+		String direction = queryGL.getExpression(1).asValue().stringValue();
+		InOutRule rule = rules.get(station);
+		String resultString = "(StationMoveType \"" + station + "\" \""+direction+"\" ";
+		if (direction.contentEquals("in")) {
+			int directionCode = 0;
+			if (station.contentEquals("101") || station.contentEquals("102"))
+				directionCode = 1;
+			resultString += "(" + rule.getInMoveType() + " " + rule.getInStation();
+			if (rule.getInMoveType().contentEquals("ReqGuideMove")) {
+				resultString += " " + directionCode;
+			}
+			resultString += ")";
+			
+		} else if (direction.contentEquals("out")) {
+			int directionCode = 1;
+			if (station.contentEquals("101") || station.contentEquals("102"))
+				directionCode = 0;
+			resultString += "(" + rule.getOutMoveType() + " " + rule.getOutStation();
+			if (rule.getOutMoveType().contentEquals("ReqGuideMove")) {
+				resultString += " " + directionCode;
+			}
+			resultString += ")";
+		}
+		resultString += ")";
+		return resultString;
 	}
 
 	private int stationVertex(String vertexName) {
@@ -261,6 +328,15 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	}
 	
 	public static void main(String[] args) {
+//		DummyRobotContextManagerAgent a = new DummyRobotContextManagerAgent();
+//		try {
+//			String result = a.getStationMoveType(GLFactory.newGLFromGLString("(StationMoveType 18 \"in\" $result)"));
+//			System.out.println(result);
+//		} catch (ParseException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		
 		try {
 			String ipr = InetAddress.getLocalHost().getHostAddress();
 			String ip = "127.0.0.1";
