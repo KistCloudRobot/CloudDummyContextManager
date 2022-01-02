@@ -7,6 +7,7 @@ public class RackPose {
 	private String robotID;
 	private String cargoID;
 	private String station;
+	private boolean preserved;
 	
 	public RackPose(int vertex1, int vertex2, String robotID, String cargoID, String station) {
 		super();
@@ -15,6 +16,14 @@ public class RackPose {
 		this.robotID = robotID;
 		this.cargoID = cargoID;
 		this.station = station;
+		this.preserved = false;
+	}
+	
+	public boolean isPreserved() {
+		return preserved;
+	}
+	public void setPreserved(boolean flag) {
+		this.preserved = flag;
 	}
 	
 	public int getVertex1() {

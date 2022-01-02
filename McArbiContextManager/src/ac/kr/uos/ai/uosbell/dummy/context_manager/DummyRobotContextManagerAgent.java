@@ -25,27 +25,27 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	RobotData rd = new RobotData();
 	String robotID = "";
 	Map<String, InOutRule> rules = Stream.of(new Object[][] {
-		{"1", new InOutRule(1, "ReqPreciseMove", 1, "ReqStraightBackMove", 206)},
-		{"2", new InOutRule(2, "ReqPreciseMove", 2, "ReqStraightBackMove", 207)},
-		{"3", new InOutRule(3, "ReqPreciseMove", 3, "ReqStraightBackMove", 208)},
-		{"4", new InOutRule(4, "ReqPreciseMove", 4, "ReqStraightBackMove", 209)},
-		{"5", new InOutRule(5, "ReqPreciseMove", 5, "ReqStraightBackMove", 210)},
-		{"6", new InOutRule(6, "ReqPreciseMove", 6, "ReqStraightBackMove", 211)},
-		{"11", new InOutRule(11, "ReqPreciseMove", 11, "ReqStraightBackMove", 218)},
-		{"12", new InOutRule(12, "ReqPreciseMove", 12, "ReqStraightBackMove", 219)},
-		{"13", new InOutRule(13, "ReqPreciseMove", 13, "ReqStraightBackMove", 220)},
-		{"14", new InOutRule(14, "ReqPreciseMove", 14, "ReqStraightBackMove", 221)},
-		{"15", new InOutRule(15, "ReqPreciseMove", 15, "ReqStraightBackMove", 222)},
-		{"18", new InOutRule(18, "ReqGuideMove", 18, "ReqStraightBackMove", 225)},
-		{"19", new InOutRule(19, "ReqGuideMove", 19, "ReqStraightBackMove", 226)},
-		{"20", new InOutRule(20, "ReqGuideMove", 20, "ReqGuideMove", 239)},
-		{"21", new InOutRule(21, "ReqGuideMove", 21, "ReqGuideMove", 240)},
-		{"22", new InOutRule(22, "ReqGuideMove", 22, "ReqStraightBackMove", 228)},
-		{"23", new InOutRule(23, "ReqGuideMove", 23, "ReqGuideMove", 229)},
-		{"101", new InOutRule(101, "ReqGuideMove", 101, "ReqGuideMove", 201)},
-		{"102", new InOutRule(102, "ReqGuideMove", 102, "ReqGuideMove", 202)},
-		{"103", new InOutRule(103, "ReqGuideMove", 103, "ReqGuideMove", 203)},
-		{"104", new InOutRule(104, "ReqGuideMove", 104, "ReqGuideMove", 204)},
+		{"1", new InOutRule(1, "PreciseMove", 1, "StraightBackMove", 206)},
+		{"2", new InOutRule(2, "PreciseMove", 2, "StraightBackMove", 207)},
+		{"3", new InOutRule(3, "PreciseMove", 3, "StraightBackMove", 208)},
+		{"4", new InOutRule(4, "PreciseMove", 4, "StraightBackMove", 209)},
+		{"5", new InOutRule(5, "PreciseMove", 5, "StraightBackMove", 210)},
+		{"6", new InOutRule(6, "PreciseMove", 6, "StraightBackMove", 211)},
+		{"11", new InOutRule(11, "PreciseMove", 11, "StraightBackMove", 218)},
+		{"12", new InOutRule(12, "PreciseMove", 12, "StraightBackMove", 219)},
+		{"13", new InOutRule(13, "PreciseMove", 13, "StraightBackMove", 220)},
+		{"14", new InOutRule(14, "PreciseMove", 14, "StraightBackMove", 221)},
+		{"15", new InOutRule(15, "PreciseMove", 15, "StraightBackMove", 222)},
+		{"18", new InOutRule(18, "GuideMove", 18, "StraightBackMove", 225)},
+		{"19", new InOutRule(19, "GuideMove", 19, "StraightBackMove", 226)},
+		{"20", new InOutRule(20, "GuideMove", 20, "GuideMove", 239)},
+		{"21", new InOutRule(21, "GuideMove", 21, "GuideMove", 240)},
+		{"22", new InOutRule(22, "GuideMove", 22, "StraightBackMove", 228)},
+		{"23", new InOutRule(23, "GuideMove", 23, "GuideMove", 229)},
+		{"101", new InOutRule(101, "GuideMove", 101, "GuideMove", 201)},
+		{"102", new InOutRule(102, "GuideMove", 102, "GuideMove", 202)},
+		{"103", new InOutRule(103, "GuideMove", 103, "GuideMove", 203)},
+		{"104", new InOutRule(104, "GuideMove", 104, "GuideMove", 204)},
 	}).collect(Collectors.toMap(data -> (String) data[0],  data -> (InOutRule) data[1]));
 
 	public DummyRobotContextManagerAgent() {
@@ -162,7 +162,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 	}
 
 	private String getStationMoveType(GeneralizedList queryGL) {
-		String station = queryGL.getExpression(0).asValue().stringValue();
+		String station = queryGL.getExpression(0).asValue().stringValue().replace("station", "");
 		String direction = queryGL.getExpression(1).asValue().stringValue();
 		InOutRule rule = rules.get(station);
 		String resultString = "(StationMoveType \"" + station + "\" \""+direction+"\" ";
@@ -171,8 +171,8 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			if (station.contentEquals("101") || station.contentEquals("102"))
 				directionCode = 1;
 			resultString += "(" + rule.getInMoveType() + " " + rule.getInStation();
-			if (rule.getInMoveType().contentEquals("ReqGuideMove")) {
-				resultString += " " + directionCode;
+			if (rule.getInMoveType().contentEquals("GuideMove")) {
+				resultString += " " + (directionCode == 0 ? "\"Forward\"" : "\"Backward\"");
 			}
 			resultString += ")";
 			
@@ -181,8 +181,8 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 			if (station.contentEquals("101") || station.contentEquals("102"))
 				directionCode = 0;
 			resultString += "(" + rule.getOutMoveType() + " " + rule.getOutStation();
-			if (rule.getOutMoveType().contentEquals("ReqGuideMove")) {
-				resultString += " " + directionCode;
+			if (rule.getOutMoveType().contentEquals("GuideMove")) {
+				resultString += " " + (directionCode == 0 ? "\"Forward\"" : "\"Backward\"");
 			}
 			resultString += ")";
 		}
@@ -339,7 +339,7 @@ public class DummyRobotContextManagerAgent extends DummyContextManagerAgent {
 		
 		try {
 			String ipr = InetAddress.getLocalHost().getHostAddress();
-			String ip = "127.0.0.1";
+			String ip = "172.16.165.106";
 			String brokerURL = "tcp://" + ip + ":61316";
 			String brokerName = System.getenv("AGENT");
 			String ContextManagerURI = "agent://www.arbi.com/" + brokerName + "/ContextManager";
