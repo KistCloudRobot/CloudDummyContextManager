@@ -189,10 +189,12 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 					RackPose rp = rack.get(rackID);
 					rp.setVertex1(vertex1);
 					rp.setVertex2(vertex2);
-					rp.setRobotID(robotID);
 					if (!robotID.contentEquals("-1")) {
 						rp.setPreserved(true);
+					} else if(robotID.contentEquals("-1") && rp.getRobotID().contentEquals(robotID)) {
+						rp.setPreserved(false);
 					}
+					rp.setRobotID(robotID);
 //					System.out.println("[RackPose]RobotID" + robotID);
 					rp.setCargoID(cargoID);
 					rp.setStation(stationName);
@@ -396,7 +398,11 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 						String key = map.getKey();
 						RackPose value = map.getValue();
 						
-						return value.getStation().contentEquals(targetStation);
+						if (value.getStation() != null) {
+							return value.getStation().contentEquals(targetStation);							
+						} else {
+							return false;
+						}
 					}).collect(Collectors.toList());
 					
 					if (rl.size()>0) {
@@ -430,12 +436,14 @@ public class DummyLocalContextManagerAgent extends DummyContextManagerAgent {
 					else
 						return "(false)";
 				} else {
-					ArrayList<String> stations = new ArrayList<String>(Arrays.asList("14","13","12","11","6","5","4","3","2","1"));
+					ArrayList<String> stations = new ArrayList<String>(Arrays.asList("5","4","2","14","13","6","12","11","3","1"));
 					stations.removeAll(preservedStations);
 					rack.forEach((key, value)->{
-						String stationString = value.getStation().replace("station", "");
-						if(stations.contains(stationString)) {
-							stations.remove(stationString);
+						if (!(value.getStation() == null)) {
+							String stationString = value.getStation().replace("station", "");
+							if(stations.contains(stationString)) {
+								stations.remove(stationString);
+							}
 						}
 					});
 					preservedStations.add(stations.get(0));
